@@ -1,8 +1,6 @@
 package com.example.oyika_slideshow_sample
 
 import ZoomOutPageTransformer
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -21,26 +19,21 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.oyika_slideshow_sample.databinding.ActivityMainBinding
 import com.example.oyika_slideshow_sample.databinding.BottomSheetSettingsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import java.io.InputStream
-import java.net.URL
 import java.util.*
 
 class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
-    val TAG = "[MainActivity]"
-    private var IMAGE_INTERVAL = 2000L // milliseconds between images
+    private var IMAGE_INTERVAL = 5000L
+    private var SLIDESHOW_TIMEOUT = 12000L
 
-    private val images = ArrayList<Bitmap>()
-    private var currentImageIndex = 0
     private var handler = Handler(Looper.getMainLooper())
     private var timer: Timer? = null
+    private var hasScrolled = false
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewPager: ViewPager2
     private lateinit var imageView: ImageView
     private lateinit var settingButton: ImageView
     private lateinit var startButton: Button
-
-
 
     private val imageUrls = listOf(
         "https://leo-oyika-kotlin.s3.ap-southeast-1.amazonaws.com/img1.jpeg",
@@ -71,10 +64,12 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
 
         writePermission.runWithPermission {
         }
-        // Start idle timer and first image
-//        handler.postDelayed({ startSlideshow() }, SLIDESHOW_TIMEOUT)
 
-//        setupViewPager()
+        handler.postDelayed({
+            if (!hasScrolled) {
+                setupViewPager()
+            }
+        }, SLIDESHOW_TIMEOUT)
     }
 
     private fun showSettingBottomSheet(listener: SettingListener) {
@@ -106,6 +101,7 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
 
     private fun setupViewPager() {
         val adapter = SlideShowAdapter(imageUrls, this)
+        hasScrolled = true
         viewPager.adapter = adapter
         viewPager.isUserInputEnabled
         viewPager.offscreenPageLimit = 2
@@ -120,53 +116,9 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
         viewPager.isVisible = !viewPager.isVisible
     }
 
-    private fun startSlideshow() {
-        // Cancel existing timer
-        timer?.cancel()
-
-        // Set timer to display images
-        timer = Timer()
-        timer?.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                // Download image if not already in memory
-                if (images.size <= currentImageIndex) {
-                    val url = imageUrls[currentImageIndex]
-                    val bitmap = downloadBitmap(url)
-                    if (bitmap != null) {
-                        images.add(bitmap)
-                    }
-                }
-
-                // Display image
-                runOnUiThread {
-                    if (currentImageIndex < images.size) {
-                        imageView.setImageBitmap(images[currentImageIndex])
-                    } else {
-                        Log.e(TAG, "run: fail" + images.size)
-                    }
-                }
-
-                // Increment current image index
-                currentImageIndex = (currentImageIndex + 1) % imageUrls.size
-            }
-        }, 0L, IMAGE_INTERVAL)
-    }
-
-    private fun downloadBitmap(url: String): Bitmap? {
-        var inputStream: InputStream? = null
-        try {
-            inputStream = URL(url).openStream()
-            Log.i(TAG, "downloadBitmap: $url")
-            return BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
-            Log.e(TAG, "downloadBitmap: error $e")
-        } finally {
-            inputStream?.close()
-        }
-        return null
-    }
-
     private fun setupAutoScroll() {
+        timer?.cancel()
+        timer = Timer()
         val update = Runnable {
             val currentItem = viewPager.currentItem
             Log.d("[paul]", "currentItem: $currentItem")
@@ -208,14 +160,6 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
     override fun onClick() {
         toggleButtons()
         handler.removeCallbacksAndMessages(null)
-//        timer?.cancel()
+        timer?.cancel()
     }
-}
-
-interface SettingListener {
-    fun onChange(interval: Long)
-}
-
-interface  ClickListener {
-    fun onClick()
 }
