@@ -1,1 +1,1 @@
-<video src="recorder.mp4" width="300"></video>
+<img src="recorder.mp4" width="300"/>

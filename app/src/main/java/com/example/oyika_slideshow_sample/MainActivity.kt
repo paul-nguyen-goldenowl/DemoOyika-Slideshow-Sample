@@ -1,19 +1,14 @@
 package com.example.oyika_slideshow_sample
 
 import ZoomOutPageTransformer
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
 import com.example.oyika_slideshow_sample.databinding.ActivityMainBinding
@@ -60,7 +55,7 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
             setupViewPager()
         }
 
-        hideSystemUI()
+        hideSystemUI(binding.root)
 
         writePermission.runWithPermission {
         }
@@ -133,32 +128,18 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
         }, IMAGE_INTERVAL, IMAGE_INTERVAL)
     }
 
-    private fun hideSystemUI() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            WindowInsetsControllerCompat(window, binding.root).let { controller ->
-                controller.hide(WindowInsetsCompat.Type.systemBars())
-                controller.systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = (
-                    View.SYSTEM_UI_FLAG_IMMERSIVE
-                            or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            or View.SYSTEM_UI_FLAG_FULLSCREEN)
-        }
-    }
-
     override fun onChange(interval: Long) {
         IMAGE_INTERVAL = interval
     }
 
     override fun onClick() {
         toggleButtons()
+        handler.removeCallbacksAndMessages(null)
+        timer?.cancel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         handler.removeCallbacksAndMessages(null)
         timer?.cancel()
     }
