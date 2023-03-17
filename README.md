@@ -24,5 +24,5 @@ To install the app, follow these steps:
    
 ## Video
 
-https://user-images.githubusercontent.com/104960766/225821240-48cbaabf-f8d6-48aa-98aa-01a3e5be0401.mp4
+recorder.mp4
 

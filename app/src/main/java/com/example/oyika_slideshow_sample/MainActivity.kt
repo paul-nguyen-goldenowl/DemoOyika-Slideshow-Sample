@@ -159,7 +159,6 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event?.actionMasked == MotionEvent.ACTION_UP) {
-            Log.i("[paul]", "onTouchEvent: ${event?.x} ${event?.y}")
             resetHandler()
         }
         return super.onTouchEvent(event)
