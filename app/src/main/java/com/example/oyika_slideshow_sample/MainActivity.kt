@@ -4,6 +4,8 @@ import ZoomOutPageTransformer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import android.view.MotionEvent
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.SeekBar
@@ -21,7 +23,6 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
 
     private var handler = Handler(Looper.getMainLooper())
     private var timer: Timer? = null
-    private var hasScrolled = false
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewPager: ViewPager2
@@ -51,18 +52,18 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
         }
 
         startButton.setOnClickListener {
+            cleanResource()
             setupViewPager()
         }
 
         hideSystemUI(binding.root)
 
+        // request write permission for download.
         writePermission.runWithPermission {
         }
 
         handler.postDelayed({
-            if (!hasScrolled) {
-                setupViewPager()
-            }
+            setupViewPager()
         }, SLIDESHOW_TIMEOUT)
     }
 
@@ -95,9 +96,7 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
 
     private fun setupViewPager() {
         val adapter = SlideShowAdapter(imageUrls, this)
-        hasScrolled = true
         viewPager.adapter = adapter
-        viewPager.isUserInputEnabled
         viewPager.offscreenPageLimit = 2
         viewPager.setPageTransformer(ZoomOutPageTransformer())
         setupAutoScroll()
@@ -111,7 +110,7 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
     }
 
     private fun setupAutoScroll() {
-        timer?.cancel()
+        cleanResource()
         timer = Timer()
         val update = Runnable {
             val currentItem = viewPager.currentItem
@@ -133,12 +132,36 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
     override fun onClick() {
         toggleButtons()
         handler.removeCallbacksAndMessages(null)
-        timer?.cancel()
+        resetHandler()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        cleanResource()
+    }
+
+    private fun cleanResource() {
         handler.removeCallbacksAndMessages(null)
         timer?.cancel()
+    }
+
+    private fun resetHandler() {
+        toast("Restart timer")
+        cleanResource()
+        startHandler()
+    }
+
+    private fun startHandler() {
+        handler.postDelayed({
+            setupViewPager()
+        }, SLIDESHOW_TIMEOUT)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event?.actionMasked == MotionEvent.ACTION_UP) {
+            Log.i("[paul]", "onTouchEvent: ${event?.x} ${event?.y}")
+            resetHandler()
+        }
+        return super.onTouchEvent(event)
     }
 }
