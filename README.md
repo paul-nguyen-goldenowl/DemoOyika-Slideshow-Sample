@@ -9,8 +9,8 @@ Build a screen showing a dashboard picture. After 2 mins idle ( if no touch acti
 ## Requirements
 To run the app, you will need:
 
-- Android Studio 4.1 or later.
-- An Android emulator or Android device running Android 5.0 or later.
+- Android Studio Dolphin | 2021.3.1 or later.
+- An Android emulator or Android device running Android 7.0 or later.
 
 ## Installation
 To install the app, follow these steps:
@@ -22,5 +22,7 @@ To install the app, follow these steps:
 5. Connect an Android device to your computer or launch an emulator.
 6. Click the "Run" button in Android Studio to build and run the app on your device or emulator.
    
-## Screenshot
-<img src="recorder.gif" width="300"/>
+## Video
+
+https://user-images.githubusercontent.com/104960766/225821240-48cbaabf-f8d6-48aa-98aa-01a3e5be0401.mp4
+
