@@ -33,8 +33,9 @@ class SlideShowViewHolder(binding: ItemSlideShowBinding) : RecyclerView.ViewHold
             .centerCrop()
             .into(imageView)
 
-        imageView.setOnClickListener {
+        imageView.setOnTouchListener { v, event ->
             listener.onClick()
+            false
         }
     }
 }

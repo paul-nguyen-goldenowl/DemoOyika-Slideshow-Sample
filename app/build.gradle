@@ -51,4 +51,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.0'
     // transform
     implementation 'com.ToxicBakery.viewpager.transforms:view-pager-transforms:2.0.24'
+    // Material
+    implementation 'com.google.android.material:material:1.8.0'
 }

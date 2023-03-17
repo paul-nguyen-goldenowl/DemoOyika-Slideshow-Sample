@@ -20,14 +20,31 @@
         android:paddingLeft="12dp"
         android:textSize="12sp" />
 
-    <SeekBar
-
-        android:progress="5000"
+    <com.google.android.material.slider.Slider
         android:id="@+id/interval_seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="10000"
-        android:min="3000" />
+        android:stepSize="1"
+        android:valueFrom="3"
+        android:value="5"
+        android:valueTo="10" />
+
+    <TextView
+        android:id="@+id/timeout_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="12dp"
+        android:textSize="12sp" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/timeout_seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stepSize="1"
+        android:valueFrom="10"
+        android:value="12"
+        android:valueTo="120" />
 
     <Button
         android:id="@+id/button_apply"

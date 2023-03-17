@@ -4,11 +4,9 @@ import ZoomOutPageTransformer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
@@ -19,7 +17,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
     private var IMAGE_INTERVAL = 5000L
-    private var SLIDESHOW_TIMEOUT = 12000L
+    private var SLIDESHOW_TIMEOUT = 120000L
 
     private var handler = Handler(Looper.getMainLooper())
     private var timer: Timer? = null
@@ -72,23 +70,28 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
         val binding = BottomSheetSettingsBinding.inflate(layoutInflater)
         bottomSheetDialog.setContentView(binding.root)
 
-        val seekBar = binding.intervalSeekBar
-        val textView = binding.intervalTextView
-        textView.text = "Interval: ${seekBar.progress}"
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    seekBar.progress = progress
-                    textView.text = "Interval: $progress"
-                }
-            }
+        val intervalSeekBar = binding.intervalSeekBar
+        val intervalTextView = binding.intervalTextView
+        intervalTextView.text = "Interval: ${intervalSeekBar.value} s"
+        intervalSeekBar.addOnChangeListener { slider, value, fromUser ->
+            intervalSeekBar.value = value
+            intervalTextView.text = "Interval: $value s"
+        }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
+        val timeoutSeekBar = binding.timeoutSeekBar
+        val timeoutTextView = binding.timeoutTextView
+        timeoutTextView.text = "Timeout: ${timeoutSeekBar.value} s"
+        timeoutSeekBar.addOnChangeListener { slider, value, fromUser ->
+            timeoutSeekBar.value = value
+            timeoutTextView.text = "Timeout: $value s"
+        }
+
         val applyButton = binding.buttonApply
         applyButton.setOnClickListener {
-            listener.onChange(seekBar.progress.toLong())
+            listener.onChange(
+                intervalSeekBar.value.toLong() * 1000,
+                timeoutSeekBar.value.toLong() * 1000
+            )
             bottomSheetDialog.dismiss()
         }
         bottomSheetDialog.show()
@@ -125,8 +128,9 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
         }, IMAGE_INTERVAL, IMAGE_INTERVAL)
     }
 
-    override fun onChange(interval: Long) {
+    override fun onChange(interval: Long, timeout: Long) {
         IMAGE_INTERVAL = interval
+        SLIDESHOW_TIMEOUT = timeout
     }
 
     override fun onClick() {
