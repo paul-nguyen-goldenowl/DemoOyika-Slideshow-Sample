@@ -4,7 +4,6 @@ import ZoomOutPageTransformer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.SeekBar
@@ -116,7 +115,6 @@ class MainActivity : AppCompatActivity(), SettingListener, ClickListener {
         timer = Timer()
         val update = Runnable {
             val currentItem = viewPager.currentItem
-            Log.d("[paul]", "currentItem: $currentItem")
             val nexItem = if (currentItem >= imageUrls.lastIndex) 0 else currentItem + 1
             viewPager.currentItem = nexItem
         }
